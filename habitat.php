@@ -7,19 +7,20 @@ function habitat_modifyChecks($event) {
   $env = Civi::settings()->get('environment');
   $messages = $event->messages;
   /* Don't do the following checks:
-  Cron (on Dev or Test)
-  Debug Mode (on Dev)
-  Check Environment (on Dev or Test; reduce to severity of "Info")
+  Cron
+  Stripe Webhooks
+  Debug Mode (on Dev only)
+  Check Environment (reduce to severity of "Info")
    */
   foreach ($messages as $key => $message) {
     $name = $message->getName();
-    if ($name === 'checkLastCron') {
+    if (in_array($name, ['checkLastCron', 'stripe_webhook'])) {
       unset($event->messages[$key]);
     }
     if ($name === 'checkEnvironment') {
       $event->messages[$key]->setLevel(\Psr\Log\LogLevel::INFO);
     }
-    if ($env === 'Dev' && $name === 'checkDebug') {
+    if ($env === 'Development' && $name === 'checkDebug') {
       unset($event->messages[$key]);
     }
   }
@@ -34,7 +35,7 @@ function habitat_civicrm_config(&$config) {
   _habitat_civix_civicrm_config($config);
   $env = Civi::settings()->get('environment');
   if ($env !== 'Production' || 1) {
-    Civi::dispatcher()->addListener('hook_civicrm_check', "habitat_modifyChecks", 10);
+    Civi::dispatcher()->addListener('hook_civicrm_check', "habitat_modifyChecks", -150);
   }
 }
 

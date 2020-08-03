@@ -2,7 +2,11 @@
 
 This module customizes settings for non-production environments.
 
-Presently, it disables the cron check on non-production environments, the "debug enabled" check on dev environments, and reduces the severity of the "non-production environment" setting to "Info".
+Presently, it disables the following checks:
+* cron 
+* debug enabled (Development sites only)
+* Stripe webhooks
+* reduces the severity of the "non-production environment" check to "Info".
 
 ## Requirements
 
