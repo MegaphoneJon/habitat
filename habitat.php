@@ -34,7 +34,7 @@ function habitat_modifyChecks($event) {
 function habitat_civicrm_config(&$config) {
   _habitat_civix_civicrm_config($config);
   $env = Civi::settings()->get('environment');
-  if ($env !== 'Production' || 1) {
+  if ($env !== 'Production') {
     Civi::dispatcher()->addListener('hook_civicrm_check', "habitat_modifyChecks", -150);
   }
 }
