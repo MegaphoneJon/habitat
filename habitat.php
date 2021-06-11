@@ -26,6 +26,33 @@ function habitat_modifyChecks($event) {
   }
 }
 
+function habitat_noSparkpost($event) {
+  if (is_a($event->mailer, 'Mail_Sparkpost')) {
+    // This is all ganked from CRM_Utils_Mail::_createMailer, we want to skip calling the hook.
+    $driver = $event->driver;
+    $params = $event->params;
+
+    if ($driver == 'CRM_Mailing_BAO_Spool') {
+      $mailer = new CRM_Mailing_BAO_Spool($params);
+    }
+    else {
+      $mailer = Mail::factory($driver, $params);
+    }
+
+    // Previously, CiviCRM bundled patches to change the behavior of 3 specific drivers. Use wrapper/filters to avoid patching.
+    $mailer = new CRM_Utils_Mail_FilteredPearMailer($driver, $params, $mailer);
+    if (in_array($driver, ['smtp', 'mail', 'sendmail'])) {
+      $mailer->addFilter('2000_log', ['CRM_Utils_Mail_Logger', 'filter']);
+      $mailer->addFilter('2100_validate', function ($mailer, &$recipients, &$headers, &$body) {
+        if (!is_array($headers)) {
+          return PEAR::raiseError('$headers must be an array');
+        }
+      });
+    }
+    $event->mailer = $mailer;
+  }
+}
+
 /**
  * Implements hook_civicrm_config().
  *
@@ -36,6 +63,7 @@ function habitat_civicrm_config(&$config) {
   $env = Civi::settings()->get('environment');
   if ($env !== 'Production') {
     Civi::dispatcher()->addListener('hook_civicrm_check', "habitat_modifyChecks", -150);
+    Civi::dispatcher()->addListener('hook_civicrm_alterMailer', "habitat_noSparkpost", -150);
   }
 }
 
