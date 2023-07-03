@@ -14,7 +14,10 @@ function habitat_modifyChecks($event) {
    */
   foreach ($messages as $key => $message) {
     $name = $message->getName();
-    if (in_array($name, ['checkLastCron', 'stripe_webhook'])) {
+    if (in_array($name, ['checkLastCron'])) {
+      unset($event->messages[$key]);
+    }
+    if (strpos($name, 'stripe_webhook')) {
       unset($event->messages[$key]);
     }
     if ($name === 'checkEnvironment') {
