@@ -26,6 +26,6 @@
   </classloader>
   <civix>
     <namespace>CRM/Habitat</namespace>
-    <format>22.05.0</format>
+    <format>23.02.1</format>
   </civix>
 </extension>
