@@ -14,7 +14,7 @@ function habitat_modifyChecks($event) {
    */
   foreach ($messages as $key => $message) {
     $name = $message->getName();
-    if (in_array($name, ['checkLastCron'])) {
+    if (in_array($name, ['checkLastCron', 'sparkpost_sendingdomains'])) {
       unset($event->messages[$key]);
     }
     if (strpos($name, 'stripe_webhook')) {
