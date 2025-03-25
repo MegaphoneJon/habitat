@@ -11,6 +11,7 @@ function habitat_modifyChecks($event) {
   Stripe Webhooks
   Debug Mode (on Dev only)
   Check Environment (reduce to severity of "Info")
+  Check Xdebug (on Dev only)
    */
   foreach ($messages as $key => $message) {
     $name = $message->getName();
@@ -24,6 +25,9 @@ function habitat_modifyChecks($event) {
       $event->messages[$key]->setLevel(\Psr\Log\LogLevel::INFO);
     }
     if ($env === 'Development' && $name === 'checkDebug') {
+      unset($event->messages[$key]);
+    }
+    if ($env === 'Development' && $name === 'checkXdebug') {
       unset($event->messages[$key]);
     }
     // Reduce 'Extensions check disabled' notice to info
